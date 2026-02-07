@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validated Names Selection Tool</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="description"
+        content="A tool for selecting validated names for experimental studies on race and ethnicity.">
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Validated Names Selection</h1>
+            <p>Select scientifically validated names for experimental studies.</p>
+            <p id="status-msg" class="text-sm">Loading data...</p>
+        </header>
+
+        <div class="layout">
+            <!-- Sidebar: Controls -->
+            <aside class="card">
+                <form id="selection-form">
+                    <div class="form-group">
+                        <label for="race">Target Race/Ethnicity</label>
+                        <select id="race" name="race">
+                            <option value="Asian">Asian</option>
+                            <option value="Black">Black</option>
+                            <option value="Hispanic">Hispanic</option>
+                            <option value="White">White</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pct_correct">Min. Correct Prob. (0-1) <span class="hint">0.8 is
+                                default</span></label>
+                        <input type="number" id="pct_correct" name="pct_correct" value="0.8" step="0.05" min="0"
+                            max="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="n_names">Number of Names</label>
+                        <input type="number" id="n_names" name="n_names" value="5" min="1" max="50">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mode">Selection Mode</label>
+                        <select id="mode" name="mode">
+                            <option value="control">Control (Similar Attributes)</option>
+                            <option value="vary">Vary (Diverse Attributes)</option>
+                            <option value="random">Random</option>
+                        </select>
+                        <div class="hint">Control minimizes diffs; Vary maximizes them.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attributes to Consider</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="attributes" value="income" checked> Income</label>
+                            <label><input type="checkbox" name="attributes" value="education" checked> Education</label>
+                            <label><input type="checkbox" name="attributes" value="citizenship" checked>
+                                Citizenship</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="order_by">Sort Results By (Optional)</label>
+                        <select id="order_by" name="order_by">
+                            <option value="none">-- Default (by Mode) --</option>
+                            <option value="mean_correct">Correct Probability (Highest)</option>
+                            <option value="avg_income">Income (Highest)</option>
+                            <option value="avg_education">Education (Highest)</option>
+                            <option value="avg_citizenship">Citizenship (Highest)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary-btn">Generate Selection</button>
+                </form>
+            </aside>
+
+            <!-- Main: Results -->
+            <main class="card">
+                <div class="results-header">
+                    <h2 id="result-count">Results</h2>
+                    <button id="download-csv" class="secondary-btn">Download CSV</button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Identity</th>
+                                <th>Pr(Correct)</th>
+                                <th>Avg Income</th>
+                                <th>Avg Education</th>
+                                <th>Avg Citizenship</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <!-- Results will form here -->
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <p>Developed by <strong>Jae Yeon Kim</strong>. Based on the R package <code>validatednamesr</code> by Jae
+                Yeon Kim and Charles Crabtree.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+                If you use this data, please cite:
+                <a href="https://doi.org/10.1038/s41597-023-01947-0" target="_blank">Crabtree, C., Kim, J.Y., Gaddis,
+                    S.M. et al. (2023). Validated names for experimental studies on race and ethnicity. <em>Sci
+                        Data</em> 10, 130.</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/selection.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

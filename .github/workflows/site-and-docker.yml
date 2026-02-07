@@ -16,27 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js (for JS tests)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install JS deps & run tests
-        working-directory: quarto-site
-        run: |
-          npm ci
-          npm test
-
-      - name: Setup Quarto
-        uses: quarto-dev/quarto-actions/setup-quarto@v2
-
-      - name: Render Quarto site
-        run: quarto render quarto-site
-
+      # Only need to upload the web-app folder
       - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v1
         with:
-          path: quarto-site/_site
+          path: web-app
 
       - name: Deploy to Pages
         uses: actions/deploy-pages@v1
