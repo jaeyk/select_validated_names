@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --primary: #4f46e5;
   --primary-hover: #4338ca;
@@ -45,8 +49,17 @@ header p {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  header h1 {
+    font-size: 1.75rem;
+  }
+
   .layout {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
@@ -132,10 +145,16 @@ button.secondary-btn:hover {
   margin-bottom: 1rem;
 }
 
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  min-width: 600px; /* Ensure table doesn't squish too much */
 }
 
 th, td {
