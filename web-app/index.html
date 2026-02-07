@@ -15,8 +15,66 @@
     <div class="container">
         <header>
             <h1>Validated Names Selection</h1>
-            <p>Select scientifically validated names for experimental studies.</p>
-            <p id="status-msg" class="text-sm">Loading data...</p>
+            <p class="subtitle">A database of 600 names with 44,000+ evaluations for experimental studies on race and
+                ethnicity.</p>
+
+            <details class="about-section">
+                <summary>About this dataset & Field Descriptions</summary>
+                <div class="about-content">
+                    <p><strong>Background:</strong> A large number of studies use names to signal race in experiments.
+                        However, names often bundle other signals like class or citizenship. This dataset, described in
+                        <a href="https://doi.org/10.1038/s41597-023-01947-0" target="_blank">Crabtree, C., Kim, J.Y.,
+                            Gaddis, S.M., Holbein, J.B., Guage, C. & Marx, W.W. (2023). Validated names for experimental
+                            studies on race and ethnicity. Sci Data 10, 130.</a>,
+                        provides validated name perceptions to help researchers isolate racial signals.
+                    </p>
+
+                    <p><strong>Methodology:</strong> Data was collected from three surveys (N=4,026 respondents) in the
+                        US. Respondents evaluated 600 names on race, citizenship, income, and education. The dataset
+                        includes over 44,170 individual name evaluations.</p>
+
+                    <p><strong>R Package:</strong> This tool is a web interface for the <a
+                            href="https://jaeyk.github.io/validatednamesr/" target="_blank">validatednamesr</a> R
+                        package.</p>
+
+                    <hr style="margin: 1rem 0; border: 0; border-top: 1px solid #eee;">
+
+                    <p><strong>Data Dictionary:</strong></p>
+                    <ul>
+                        <li><strong>Identity:</strong> The intended racial identity of the name, based on US Census
+                            prevalence data (e.g., names ≥90% used by a specific group).</li>
+                        <li><strong>Pr(Correct) / Correct Probability:</strong> The proportion of respondents who
+                            correctly identified the name's intended racial group. Higher values indicate a stronger
+                            racial signal.</li>
+                        <li><strong>Avg Income:</strong> Perceived income level (1=Low <$40k, 2=Middle, 3=High>$120k).
+                        </li>
+                        <li><strong>Avg Education:</strong> Perceived education level (1=High School, 2=Bachelor's,
+                            3=Master's, 4=PhD).</li>
+                        <li><strong>Avg Citizenship:</strong> The probability (0-1) that respondents perceived the
+                            person as a US citizen.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="about-section" style="margin-top: 0.5rem;">
+                <summary>Potential Use Cases</summary>
+                <div class="about-content">
+                    <ul>
+                        <li><strong>Isolating Racial Signals:</strong> Select names that vary by race but have similar
+                            perceived income, education, and citizenship to conduct rigorous tests of racial
+                            discrimination (controlling for confounding variables).</li>
+                        <li><strong>Bundled Treatments:</strong> Intentionally select names that signal both race and
+                            specific socioeconomic classes to study intersectional biases.</li>
+                        <li><strong>Audit Studies:</strong> Use validated names to signal attributes (like citizenship
+                            or class) in contexts where explicitly stating them is difficult (e.g., resume or email
+                            audits).</li>
+                        <li><strong>Robustness Checks:</strong> Select multiple names per racial group to ensure
+                            findings are not driven by unique features of a single name.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <p id="status-msg" class="text-sm" style="margin-top: 1rem;">Loading data...</p>
         </header>
 
         <div class="layout">
@@ -34,8 +92,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="pct_correct">Min. Correct Prob. (0-1) <span class="hint">0.8 is
-                                default</span></label>
+                        <label for="pct_correct">Min. Correct Prob. (0-1)</label>
                         <input type="number" id="pct_correct" name="pct_correct" value="0.8" step="0.05" min="0"
                             max="1">
                     </div>
@@ -66,7 +123,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="order_by">Sort Results By (Optional)</label>
+                        <label for="order_by">Sort Results By</label>
                         <select id="order_by" name="order_by">
                             <option value="none">-- Default (by Mode) --</option>
                             <option value="mean_correct">Correct Probability (Highest)</option>
@@ -108,12 +165,21 @@
         </div>
 
         <footer>
-            <p>Developed by <strong>Jae Yeon Kim</strong>. Based on the R package <code>validatednamesr</code> by Jae
+            <p>Developed by <a href="https://jaeyk.github.io/" target="_blank"><strong>Jae Yeon Kim</strong></a>. Based
+                on the R package <a href="https://jaeyk.github.io/validatednamesr/"
+                    target="_blank"><code>validatednamesr</code></a> by Jae
                 Yeon Kim and Charles Crabtree.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+                For suggestions or questions on this tool, please contact <a href="mailto:jaekim@unc.edu">Jae Yeon
+                    Kim</a>.<br>
+                For data-related inquiries, please contact <a href="mailto:charles.crabtree@monash.edu">Charles
+                    Crabtree</a>.
+            </p>
             <p style="margin-top: 0.5rem; font-size: 0.8rem;">
                 If you use this data, please cite:
                 <a href="https://doi.org/10.1038/s41597-023-01947-0" target="_blank">Crabtree, C., Kim, J.Y., Gaddis,
-                    S.M. et al. (2023). Validated names for experimental studies on race and ethnicity. <em>Sci
+                    S.M., Holbein, J.B., Guage, C. & Marx, W.W. (2023). Validated names for experimental studies on race
+                    and ethnicity. <em>Sci
                         Data</em> 10, 130.</a>
             </p>
         </footer>

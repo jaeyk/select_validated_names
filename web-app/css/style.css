@@ -169,3 +169,41 @@ footer {
 .p-4 { padding: 1rem; }
 .text-sm { font-size: 0.875rem; }
 .hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+/* Additions for About Section */
+.subtitle {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.about-section {
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-section summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.about-content {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.about-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.about-content li {
+    margin-bottom: 0.25rem;
+}
