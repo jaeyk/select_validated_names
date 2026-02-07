@@ -1,17 +1,3 @@
-# validatednamesr
-
-Authors: [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/)
-
-## Summary 
-    
-Researchers have used names to indicate race in various experimental tasks such as surveys, conjoint experiments, and correspondence experiments. When doing so, researchers must consider at least the following three factors:
-
-- Choose names that vary by race but remain constant across other perceived attributes, or choose names that vary by race and other perceived attributes.
-- Use not only one but several names to increase reliability.
-- Use names that indicate differences in citizenship, education, and income within and across races to explore.
-
-This R package provides functions to perform each task based on a validated dataset of 600 names (100 white, 300 Asian, 100 black, and 100 Hispanic) published in *Nature Scientific Data* ([Crabtree, Kim, Gaddis, Holbein, Guage, and Marx, 2023](https://www.nature.com/articles/s41597-023-01947-0#Sec10)). It helps researchers choose names in an experimental study that are consistent with their research objectives and underlying assumptions.
-
 # validatednamesr — Interactive Site and R Package
 
 Authors: [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/)
