@@ -1,100 +1,57 @@
-# Interactive Site for `validatednamesr`
+# Validated Names Selection Tool
 
-Authors: [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/)
+A standalone, web-based interface for selecting scientifically validated names for experimental studies on race and ethnicity. This tool replicates the logic of the [`validatednamesr`](https://jaeyk.github.io/validatednamesr/) R package directly in your browser using Vanilla JavaScript.
 
-This repository contains the `validatednamesr` R package and a **static web-based interface** that replicates the package's selection logic in the browser (no R required). The interactive site lets users select validated names by parameters, just like the R package, using a bundled sample dataset.
-
-## Research Background
-
-The site helps researchers design studies that account for name-based racial bias:
-
-- **Control mode**: Select names that are similar across your chosen attributes (e.g., income, education) to keep attributes constant while varying race.
-- **Vary mode**: Select names that maximize attribute diversity across races to explore how perceived identity interacts with other attributes.
-- Use **multiple names per racial group** to increase statistical reliability.
-- Explore attribute interactions on citizenship, education, and income.
+**[Live Website](https://jaeyk.github.io/select_validated_names/)**
 
 ## Features
 
-- **Parameter-driven selection** – choose race, pronunciation correctness threshold, number of names, attributes, and selection mode
-- **Instant results** – pure JavaScript selection algorithm runs in your browser
-- **Bundled sample data** – 16 validated names (4 per racial group) included
-- **Easy exports** – download results as CSV or Excel (.xlsx)
-- **No setup required** – fully static site; visit the deployed URL and start selecting
+*   **Parameter-Driven Selection:** Filter names by race/ethnicity, minimum correct identification probability, and other attributes.
+*   **Scientific Rigor:** Based on a dataset of 600 names with over 44,000 evaluations (Crabtree et al., 2023).
+*   **Flexible Modes:**
+    *   **Control Mode:** Select names with similar perceived attributes (income, education, citizenship) to isolate racial signals.
+    *   **Vary Mode:** Select names with diverse attributes to study intersectional biases.
+*   **Instant Export:** Download your selected list of names as a CSV file.
+*   **Privacy-First:** All processing happens in your browser; no data is sent to external servers.
+
+## Usage
+
+1.  **access the Tool:** Visit the [live site](https://jaeyk.github.io/select_validated_names/) or run it locally.
+2.  **Configure Parameters:**
+    *   **Target Race/Ethnicity:** Asian, Black, Hispanic, or White.
+    *   **Min. Correct Prob.:** The minimum probability (0-1) that the name is correctly perceived as the intended group.
+    *   **Number of Names:** How many names you want to generate.
+    *   **Selection Mode:** `Control` (similar attributes) or `Vary` (diverse attributes) or `Random`.
+    *   **Attributes:** Choose which perceptions (Income, Education, Citizenship) to factor into the selection.
+3.  **Generate & Download:** Click "Generate Selection" to view results, then "Download CSV" to save them.
 
 ## Local Development
 
-### Prerequisites
-- **Node.js** (for running tests)
-- **Quarto** (for rendering the site locally, optional)
+To run the site on your local machine:
 
-### Development Commands
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/jaeyk/select_validated_names.git
+    cd select_validated_names
+    ```
 
-```bash
-# Run JS unit tests for the selection algorithm
-make test
+2.  **Launch the local server:**
+    We provide a helper script to launch a lightweight Python HTTP server.
+    ```bash
+    ./launch_site.sh
+    ```
+    Open your browser to `http://localhost:8000`.
 
-# Render the Quarto site
-make render
+## Credits & Citation
 
-# Serve the site locally on http://localhost:4000
-make serve
+**Developed by:** [Jae Yeon Kim](https://jaeyk.github.io/) (UNC Chapel Hill)
+**Original Data & R Package:** [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/) (Monash University)
 
-# Render site, then serve it
-make dev
-```
+If you use this tool or data in your research, please cite:
 
-## Using the Site
+> Crabtree, C., Kim, J.Y., Gaddis, S.M., Holbein, J.B., Guage, C. & Marx, W.W. (2023). Validated names for experimental studies on race and ethnicity. *Sci Data* 10, 130. https://doi.org/10.1038/s41597-023-01947-0
 
-1. **Visit the site** (deployed at the GitHub Pages URL or locally via `make dev`)
-2. **Choose parameters:**
-   - **Race/Ethnicity**: Filter by a specific race or use all races
-   - **Min Correct Pronunciation (%)**: Set a minimum threshold (0–100)
-   - **Number of Names**: How many names to select (1–16)
-   - **Order Results By**: Sort results by a specific attribute (or no sort)
-   - **Selection Mode**: `control` (attributes similar across races) or `vary` (maximize diversity)
-   - **Attributes to Consider**: Select which attributes (Income, Education, Citizenship) inform the selection
-3. **Run Selection** to see results in the table
-4. **Download** results as CSV or Excel
+## Contact
 
-## Deployment
-
-The site is automatically deployed to **GitHub Pages** via GitHub Actions on every push to the `main` branch.
-
-- GitHub Actions workflow (`.github/workflows/site-and-docker.yml`):
-  - Runs JS unit tests
-  - Renders the Quarto site
-  - Deploys to GitHub Pages
-
-## Project Structure
-
-```
-.
-├── quarto-site/           # Quarto site source
-│   ├── index.qmd          # Main page (Quarto markdown + inline HTML)
-│   ├── _quarto.yml        # Quarto configuration
-│   ├── js/
-│   │   ├── selection_core.js    # Core selection algorithm (UMD module)
-│   │   ├── select_names.js      # Wrapper (client demos)
-│   │   └── __tests__/           # Jest unit tests
-│   ├── data/
-│   │   └── sample_names.json    # 16-name sample dataset
-│   └── _site/             # Built static site (deployed to Pages)
-├── R/                     # Original R package source
-├── tests/                 # R package tests
-├── Makefile              # Common tasks
-└── README.md             # This file
-```
-
-## How It Works
-
-The **selection algorithm** (in `quarto-site/js/selection_core.js`) implements the R package's core logic in JavaScript:
-
-1. **Filter** the dataset by race and pronunciation correctness
-2. **Compute** the median value for each selected attribute
-3. **Rank** candidates by Euclidean distance to the median vector
-4. **Select** the requested number of names:
-   - **Control mode**: Names closest to the median (similar to each other)
-   - **Vary mode**: Names farthest from the median (diverse from each other)
-5. **Sort** results by optional attribute
-
-Results are rendered as an interactive table with options to export as CSV or Excel.
+*   **Tool Suggestions/Questions:** [Jae Yeon Kim](mailto:jaekim@unc.edu)
+*   **Data Inquiries:** [Charles Crabtree](mailto:charles.crabtree@monash.edu)
