@@ -1,0 +1,21 @@
+[
+  {"name":"Li Wei","identity":"Asian","mean_correct":0.92,"income_ord":3,"education_ord":3,"citizen":0.8},
+  {"name":"Sung Kim","identity":"Asian","mean_correct":0.88,"income_ord":3,"education_ord":2,"citizen":0.9},
+  {"name":"Aisha Khan","identity":"Asian","mean_correct":0.85,"income_ord":2,"education_ord":3,"citizen":0.7},
+  {"name":"Hiro Tanaka","identity":"Asian","mean_correct":0.95,"income_ord":4,"education_ord":4,"citizen":0.95},
+
+  {"name":"John Smith","identity":"White","mean_correct":0.9,"income_ord":3,"education_ord":3,"citizen":0.95},
+  {"name":"Emily Davis","identity":"White","mean_correct":0.87,"income_ord":3,"education_ord":4,"citizen":0.95},
+  {"name":"Linda Johnson","identity":"White","mean_correct":0.82,"income_ord":2,"education_ord":2,"citizen":0.9},
+  {"name":"Peter Brown","identity":"White","mean_correct":0.9,"income_ord":4,"education_ord":3,"citizen":0.98},
+
+  {"name":"Tyrone Jackson","identity":"Black","mean_correct":0.86,"income_ord":2,"education_ord":2,"citizen":0.85},
+  {"name":"Latoya Williams","identity":"Black","mean_correct":0.9,"income_ord":2,"education_ord":3,"citizen":0.9},
+  {"name":"Darius Green","identity":"Black","mean_correct":0.8,"income_ord":3,"education_ord":3,"citizen":0.88},
+  {"name":"Monique Harris","identity":"Black","mean_correct":0.83,"income_ord":2,"education_ord":2,"citizen":0.87},
+
+  {"name":"Carlos Gomez","identity":"Hispanic","mean_correct":0.88,"income_ord":2,"education_ord":2,"citizen":0.8},
+  {"name":"Maria Rodriguez","identity":"Hispanic","mean_correct":0.9,"income_ord":3,"education_ord":3,"citizen":0.9},
+  {"name":"Jose Martinez","identity":"Hispanic","mean_correct":0.84,"income_ord":2,"education_ord":2,"citizen":0.85},
+  {"name":"Lucia Hernandez","identity":"Hispanic","mean_correct":0.86,"income_ord":3,"education_ord":3,"citizen":0.88}
+]
