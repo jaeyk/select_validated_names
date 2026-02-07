@@ -1,0 +1,34 @@
+Package: validatednamesr
+Title: An R package for viewing, loading, and extracting the validated names for experimental studies on race and ethnicity datasets
+Description: A convenient tool for working validatd names for for experimental studies on race and ethnicity datasets.
+Version: 1.0.1
+Authors@R:
+  c(person(given = "Jae Yeon", 
+           family = "Kim", 
+           email = "jkim638@jhu.edu", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-6533-7910")),
+    person(given = "Charles",
+           family = "Crabtree",
+           role = c("aut"),
+           email = "Charles.D.Crabtree@dartmouth.edu"))
+Maintainer: Jae Yeon Kim <jkim638@jhu.edu>
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports: 
+    dataverse,
+    dplyr,
+    magrittr,
+    purrr,
+    readr,
+    stringr
+LazyData: true
+Depends: 
+  R (>= 3.6)
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
