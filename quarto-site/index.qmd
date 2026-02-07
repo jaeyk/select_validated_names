@@ -1,0 +1,185 @@
+---
+title: "Select Validated Names — Interactive"
+format: html
+---
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+# Select Validated Names (Interactive)
+
+This interactive site is a non-technical, user-friendly interface for the underlying R package and data.
+
+---
+
+## validatednamesr
+
+**Authors:** Jae Yeon Kim and Charles Crabtree
+
+### Summary
+
+Researchers have used names to indicate race in various experimental tasks such as surveys, conjoint experiments, and correspondence experiments. When doing so, researchers must consider at least the following three factors:
+
+- Choose names that vary by race but remain constant across other perceived attributes, or choose names that vary by race and other perceived attributes.
+- Use not only one but several names to increase reliability.
+- Use names that indicate differences in citizenship, education, and income within and across races to explore.
+
+This R package provides functions to perform each task based on a validated dataset of 600 names (100 white, 300 Asian, 100 black, and 100 Hispanic) published in Nature Scientific Data (Crabtree, Kim, Gaddis, Holbein, Guage, and Marx, 2023). It helps researchers choose names in an experimental study that are consistent with their research objectives and underlying assumptions.
+
+### Installation (R)
+
+Install the R package if you want to run the original functions locally in R:
+
+```r
+devtools::install_github("jaeyk/validatednamesr", dependencies = TRUE)
+```
+
+### Usage (R)
+
+View and load datasets using the package functions `view_data()` and `load_data()`, then select names with `select_names()` or `select_names_all()`.
+
+This interactive site reproduces the package's selection logic in the browser so you can upload data or use the bundled sample and get results without running R. If you prefer exact R outputs (for example, `.rds` files), use the Download RDS feature which requires the optional Plumber API (see README and deployment docs).
+
+---
+
+<div id="app">
+  <div id="api-health" style="float:right; font-size:12px; color:#666">API: <span id="api-health-status">unknown</span></div>
+  <div style="margin-bottom:12px;">
+    <label>Upload dataset (CSV / JSON / Excel): <input id="file-input" type="file" accept=".csv,.json,.xlsx,.xls"></label>
+    <button id="use-sample">Use sample data</button>
+  </div>
+  <div id="mapping-area" style="margin-bottom:12px; display:none; border:1px solid #eee; padding:8px;">
+    <strong>Column mapping</strong>
+    <div id="mapping-controls" style="margin-top:8px;"></div>
+    <div style="margin-top:8px;">
+      <button id="apply-mapping">Apply mapping</button>
+      <button id="clear-mapping">Clear mapping</button>
+    </div>
+    <div style="margin-top:8px; font-size:12px; color:#666;">If your file uses different column names, map them here to the expected fields.</div>
+  </div>
+  <label>Race:
+    <select id="race">
+      <option value="Asian">Asian</option>
+      <option value="White">White</option>
+      <option value="Black">Black</option>
+      <option value="Hispanic">Hispanic</option>
+    </select>
+  </label>
+
+  <label>pct_correct: <input id="pct_correct" type="number" value="0.8" step="0.01" min="0" max="1"></label>
+  <label>order_by_var:
+    <select id="order_by_var">
+      <option value="">(random)</option>
+      <option value="pct_correct">pct_correct</option>
+      <option value="avg_income">avg_income</option>
+      <option value="avg_education">avg_education</option>
+      <option value="avg_citizenship">avg_citizenship</option>
+    </select>
+  </label>
+  <label>n_names: <input id="n_names" type="number" value="5" min="1" max="50"></label>
+  <div style="margin-top:8px;">
+    <strong>Selection mode</strong>
+    <div>
+      <label><input type="radio" name="mode" value="control" checked> Vary by race only (attributes constant)</label>
+      <label style="margin-left:12px;"><input type="radio" name="mode" value="vary"> Vary by race and attributes</label>
+    </div>
+    <div style="margin-top:6px;">
+      <strong>Attributes to consider</strong>
+      <label style="margin-left:8px;"><input type="checkbox" id="attr-income" checked> Income</label>
+      <label style="margin-left:8px;"><input type="checkbox" id="attr-education" checked> Education</label>
+      <label style="margin-left:8px;"><input type="checkbox" id="attr-citizen" checked> Citizenship</label>
+    </div>
+  </div>
+  <button id="run">Run</button>
+  <button id="download-csv">Download CSV</button>
+  <button id="download-xlsx">Download Excel (.xlsx)</button>
+  <button id="download-rds">Download RDS (server-side only)</button>
+
+  <div id="results"></div>
+</div>
+
+<script src="js/select_names.js"></script>
+<script src="js/selection_core.js"></script>
+<script>
+// Health check ping
+async function pingHealth() {
+  try {
+    const r = await fetch('/health');
+    const s = document.getElementById('api-health-status');
+    if (r.ok) s.textContent = 'ok'; else s.textContent = 'unreachable';
+  } catch (e) { document.getElementById('api-health-status').textContent = 'unreachable'; }
+}
+pingHealth();
+
+// Run selection
+document.getElementById('run').addEventListener('click', async () => {
+  const race = document.getElementById('race').value;
+  const pct = parseFloat(document.getElementById('pct_correct').value);
+  const order = document.getElementById('order_by_var').value || null;
+  const n = parseInt(document.getElementById('n_names').value, 10);
+  const out = await window.selectNames(race, pct, order, n);
+  window._lastOutput = out;
+  const el = document.getElementById('results');
+  window.renderTable(out, el);
+});
+
+// Downloads
+document.getElementById('download-csv').addEventListener('click', () => {
+  if (!window._lastOutput) return alert('Run first');
+  const csv = window.toCSV(window._lastOutput);
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'selected_names.csv';
+  a.click();
+});
+
+document.getElementById('download-xlsx').addEventListener('click', () => {
+  if (!window._lastOutput) return alert('Run first');
+  const ws = XLSX.utils.json_to_sheet(window._lastOutput);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'selected');
+  XLSX.writeFile(wb, 'selected_names.xlsx');
+});
+
+document.getElementById('download-rds').addEventListener('click', async () => {
+  if (!window._lastOutput) return alert('Run first');
+  const payload = { rows: window._lastOutput, filename: 'selected_names.rds' };
+  try {
+    const resp = await fetch('/rds', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!resp.ok) throw new Error(resp.statusText || resp.status);
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'selected_names.rds';
+    a.click();
+  } catch (err) {
+    alert('RDS generation failed: ' + err.message + '\nEnsure the Plumber API is running at /rds');
+  }
+});
+
+// File upload handling: parse and set dataset
+document.getElementById('file-input').addEventListener('change', async (ev) => {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  try {
+    const parsed = await window.parseUploadedFile(f);
+    window.setData(parsed);
+    alert('Dataset loaded. Now Run with the uploaded data.');
+  } catch (err) {
+    console.error(err);
+    alert('Unable to parse file: ' + err.message);
+  }
+});
+
+document.getElementById('use-sample').addEventListener('click', () => {
+  window.setData(null); // reset to sample
+  alert('Using bundled sample dataset');
+});
+</script>

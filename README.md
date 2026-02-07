@@ -12,89 +12,75 @@ Researchers have used names to indicate race in various experimental tasks such 
 
 This R package provides functions to perform each task based on a validated dataset of 600 names (100 white, 300 Asian, 100 black, and 100 Hispanic) published in *Nature Scientific Data* ([Crabtree, Kim, Gaddis, Holbein, Guage, and Marx, 2023](https://www.nature.com/articles/s41597-023-01947-0#Sec10)). It helps researchers choose names in an experimental study that are consistent with their research objectives and underlying assumptions.
 
-## Installation 
+```
+# validatednamesr — Interactive Site and R Package
 
-``` r
-devtools::install_github("jaeyk/validatednamesr", dependencies = TRUE)
+Authors: [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/)
+
+This repository contains the `validatednamesr` R package and an interactive Quarto website that lets users run the package's main workflows in the browser (no R required). The site reproduces the package's selection logic in JavaScript, accepts uploaded datasets (CSV / JSON / Excel), supports column mapping, and can generate downloads (CSV/Excel client-side and RDS via an optional Plumber API).
+
+Core research guidance (from the original README):
+- Choose names that vary by race while keeping other perceived attributes constant, or choose names that vary by both race and other perceived attributes.
+- Use multiple names per racial group to increase reliability.
+- Use names that indicate variation in citizenship, education, and income to explore attribute interactions.
+
+Site features
+- Interactive selection UI with controls for:
+	- Race, pct_correct threshold, number of names (`n_names`)
+	- Selection mode: `control` (attributes constant across races) or `vary` (attributes vary across races)
+	- Attribute checkboxes: Income, Education, Citizenship
+	- Column mapping UI for uploaded datasets
+- Client-side parsing and downloads: CSV and Excel (.xlsx)
+- Optional RDS generation via a Plumber API (Dockerized) for authentic R `.rds` files
+
+Quickstart — run locally
+1. Install prerequisites: Docker (required), Quarto (optional for rendering locally), and Node.js (for JS tests).
+
+2. Build & run (quick):
+```bash
+# build and run plumber image and serve site via docker-compose
+docker-compose up -d --build
+
+# open the site at http://localhost:4000 and plumber API at http://localhost:8000
 ```
 
-## Usage 
-
-### View and load datasets 
-
-1. `view_data()`: This function views the dataset's filename, type, and notes (metadata). 
-
-``` r
-view_data()
-
-#>            filename    type          notes
-#> 1         names.rds   Names      Raw names
-#> 2 study-1-names.rds Studies Study 1 result
-#> 3 study-2-names.rds Studies Study 2 result
-#> 4 study-3-names.rds Studies Study 3 result
-#> 5      study123.rds  Pooled  Pooled result
-````
-
-2. `load_data()`: This function loads a particular dataset. Use either the `file_name` or `file_note` argument.
-
-``` r
-# The following two commands will provide the same output.
-
-#file name
-raw_names <- load_data(file_name = "names.rds")
-
-# file note 
-raw_names <- load_data(file_note = "Raw names")
+3. Or use the convenience script (renders the site and serves it):
+```bash
+chmod +x scripts/launch_local.sh
+./scripts/launch_local.sh
 ```
 
-### Select names 
+Using the site
+- Open the site in your browser (http://localhost:4000 when running via `docker-compose` or script).
+- Upload a dataset (CSV / JSON / Excel) or use the bundled sample.
+- If your column names differ from the package, use the Column mapping box to map fields (e.g., `name`, `identity`, `mean_correct`, `income`, `education`, `citizen`).
+- Choose `control` mode to select names that are similar across chosen attributes (keeps attributes constant across races), or `vary` mode to select names that maximize attribute differences across races.
+- Click `Run` to see results. Use `Download CSV` or `Download Excel` for client-side exports. Use `Download RDS` to request an `.rds` file from the Plumber API.
 
-The `select_names()` function helps to choose the validated names that are intended to signal a particular race using the `race` argument. The options available for this argument are: `Asian,` `Black,` `Hispanic,` `White.`
-
-The output of this data is a dataframe with nine columns: `first` (first name), `last` = last name, `w.asian` = westernized Asian name (1 = yes, 0 = no), `name` (full name), `identity` (the name's intended race), `mean_correct` = the percentage of the name's intended race correctly perceived (0-1), `avg_income` = average perceived income level (1-5), `avg_education` = average perceived education level (1-5), `avg_citizenship` = the percentage of perceived citizenship status (0-1).
-
-``` r
-asian_names <- select_names(race = "Asian") # Asian signalling names 
-
-asian_names 
-
-#>   first last  w.asian name      identity       mean_correct avg_income avg_education avg_citizenship
-#>   <chr> <chr>   <dbl> <chr>     <fct>            <dbl>   <dbl>   <dbl>   <dbl>
-#> 1 Dan   Yang        1 Dan Yang  Asian or Paci…   0.848    2.09    2.55   0.773
-#> 2 Hong  Pham        0 Hong Pham Asian or Paci…   0.826    1.94    2.28   0.465
-#> 3 May   Chen        1 May Chen  Asian or Paci…   0.878    2.07    2.37   0.789
-#> 4 Hong  Le          0 Hong Le   Asian or Paci…   0.816    1.97    2.42   0.539
-#> 5 Wei   Le          0 Wei Le    Asian or Paci…   0.806    1.93    2.18   0.418
+Development & tests
+- Run JS unit tests for selection logic:
+```bash
+cd quarto-site
+npm ci
+npm test
 ```
-
-You can change the threshold level of the names to be correctly perceived using the `pct_correct` argument. The default value for this argument is `0.8.`
-
-``` r
-# change the threshold level of the names to be correctly perceived from 0.8 (the default value) to 0.7
-
-high_thres_names <- select_names(race = "Asian", pct_correct = 0.7)
+- Quick CORS check (start the API first):
+```bash
+chmod +x scripts/test_cors.sh
+./scripts/test_cors.sh http://localhost:8000
 ```
+- Makefile targets are provided for common tasks, e.g. `make render`, `make build-image`, `make compose-up`, `make test-js`, `make test-cors`.
 
-You can also change the number of the names to be selected using the `n_names` argument. The default value for this argument is `5.` These names will be selected randomly.  
+Deployment & CI
+- GitHub Actions workflow (`.github/workflows/site-and-docker.yml`) does:
+	- Run JS tests, render the Quarto site, deploy the site to GitHub Pages.
+	- Build and push the Plumber Docker image to GitHub Container Registry (GHCR) and tags images with both `:latest` and the commit SHA.
+- See `README_DEPLOY.md` for Docker/compose and deployment notes.
 
-``` r
-# change the number of the names to be selected from 5 (the default value) to 10 
+Notes
+- The site implements the package logic in client-side JavaScript for interactivity. For exact reproductions or to call R-specific functions, start the Plumber API (the Docker image attempts to install the package and exposes `/rds` to generate `.rds` files).
+- If the site and API are served from different origins, CORS is enabled in the Plumber API (`quarto-site/api/plumber.R`).
 
-greater_n_names <- select_names(race = "Asian", n_names = 10)
-```
-
-Rather than using random sampling, it is possible to select names by ordering them according to a chosen variable. This is done by specifying the `order_by_var` argument. The values available for it are: `pct_correct` = the percentage of the name's intended race correctly perceived, `avg_income` = average perceived income level, `avg_education` = average perceived education level, and `avg_citizenship` = the percentage of perceived citizenship status. 
-
-``` r
-top_correct_names <- select_names(race = "Asian", order_by = "pct_correct")
-```
-
-Finally, if you would like to select the names from all racial groups, use `select_nams_all()` instead of `select_names().` Note that `select_names_all()` does not have the `race` argument, but all the other arguments are identical. 
-
-``` r
-all_race_names <- select_names_all()
-```
-
-## How to cite
+How to cite
 
 Kim, J and Crabtree, C. (2022). validatednamesr: R package for viewing, loading, and visualizing the Validated Names for Experimental Studies on Race and Ethnicity datasets.

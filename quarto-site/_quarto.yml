@@ -1,0 +1,16 @@
+project:
+  type: website
+
+website:
+  title: Select Validated Names (Interactive)
+  navbar:
+    left:
+      - text: Home
+        href: index.qmd
+
+format:
+  html:
+    theme: cosmo
+    highlight-style: tango
+
+editor: visual
