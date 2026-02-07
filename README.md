@@ -1,4 +1,4 @@
-# validatednamesr — Interactive Site and R Package
+# Interactive Site for `validatednamesr`
 
 Authors: [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/)
 
