@@ -98,12 +98,3 @@ The **selection algorithm** (in `quarto-site/js/selection_core.js`) implements t
 5. **Sort** results by optional attribute
 
 Results are rendered as an interactive table with options to export as CSV or Excel.
-
-## How to Cite
-
-Kim, J and Crabtree, C. (2022). validatednamesr: R package for viewing, loading, and visualizing the Validated Names for Experimental Studies on Race and Ethnicity datasets.
-
-
-How to cite
-
-Kim, J and Crabtree, C. (2022). validatednamesr: R package for viewing, loading, and visualizing the Validated Names for Experimental Studies on Race and Ethnicity datasets.
