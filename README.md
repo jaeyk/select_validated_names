@@ -2,69 +2,107 @@
 
 Authors: [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/)
 
-This repository contains the `validatednamesr` R package and an interactive Quarto website that lets users run the package's main workflows in the browser (no R required). The site reproduces the package's selection logic in JavaScript, accepts uploaded datasets (CSV / JSON / Excel), supports column mapping, and can generate downloads (CSV/Excel client-side and RDS via an optional Plumber API).
+This repository contains the `validatednamesr` R package and a **static web-based interface** that replicates the package's selection logic in the browser (no R required). The interactive site lets users select validated names by parameters, just like the R package, using a bundled sample dataset.
 
-Core research guidance (from the original README):
-- Choose names that vary by race while keeping other perceived attributes constant, or choose names that vary by both race and other perceived attributes.
-- Use multiple names per racial group to increase reliability.
-- Use names that indicate variation in citizenship, education, and income to explore attribute interactions.
+## Research Background
 
-Site features
-- Interactive selection UI with controls for:
-	- Race, pct_correct threshold, number of names (`n_names`)
-	- Selection mode: `control` (attributes constant across races) or `vary` (attributes vary across races)
-	- Attribute checkboxes: Income, Education, Citizenship
-	- Column mapping UI for uploaded datasets
-- Client-side parsing and downloads: CSV and Excel (.xlsx)
-- Optional RDS generation via a Plumber API (Dockerized) for authentic R `.rds` files
+The site helps researchers design studies that account for name-based racial bias:
 
-Quickstart — run locally
-1. Install prerequisites: Docker (required), Quarto (optional for rendering locally), and Node.js (for JS tests).
+- **Control mode**: Select names that are similar across your chosen attributes (e.g., income, education) to keep attributes constant while varying race.
+- **Vary mode**: Select names that maximize attribute diversity across races to explore how perceived identity interacts with other attributes.
+- Use **multiple names per racial group** to increase statistical reliability.
+- Explore attribute interactions on citizenship, education, and income.
 
-2. Build & run (quick):
+## Features
+
+- **Parameter-driven selection** – choose race, pronunciation correctness threshold, number of names, attributes, and selection mode
+- **Instant results** – pure JavaScript selection algorithm runs in your browser
+- **Bundled sample data** – 16 validated names (4 per racial group) included
+- **Easy exports** – download results as CSV or Excel (.xlsx)
+- **No setup required** – fully static site; visit the deployed URL and start selecting
+
+## Local Development
+
+### Prerequisites
+- **Node.js** (for running tests)
+- **Quarto** (for rendering the site locally, optional)
+
+### Development Commands
+
 ```bash
-# build and run plumber image and serve site via docker-compose
-docker-compose up -d --build
+# Run JS unit tests for the selection algorithm
+make test
 
-# open the site at http://localhost:4000 and plumber API at http://localhost:8000
+# Render the Quarto site
+make render
+
+# Serve the site locally on http://localhost:4000
+make serve
+
+# Render site, then serve it
+make dev
 ```
 
-3. Or use the convenience script (renders the site and serves it):
-```bash
-chmod +x scripts/launch_local.sh
-./scripts/launch_local.sh
+## Using the Site
+
+1. **Visit the site** (deployed at the GitHub Pages URL or locally via `make dev`)
+2. **Choose parameters:**
+   - **Race/Ethnicity**: Filter by a specific race or use all races
+   - **Min Correct Pronunciation (%)**: Set a minimum threshold (0–100)
+   - **Number of Names**: How many names to select (1–16)
+   - **Order Results By**: Sort results by a specific attribute (or no sort)
+   - **Selection Mode**: `control` (attributes similar across races) or `vary` (maximize diversity)
+   - **Attributes to Consider**: Select which attributes (Income, Education, Citizenship) inform the selection
+3. **Run Selection** to see results in the table
+4. **Download** results as CSV or Excel
+
+## Deployment
+
+The site is automatically deployed to **GitHub Pages** via GitHub Actions on every push to the `main` branch.
+
+- GitHub Actions workflow (`.github/workflows/site-and-docker.yml`):
+  - Runs JS unit tests
+  - Renders the Quarto site
+  - Deploys to GitHub Pages
+
+## Project Structure
+
+```
+.
+├── quarto-site/           # Quarto site source
+│   ├── index.qmd          # Main page (Quarto markdown + inline HTML)
+│   ├── _quarto.yml        # Quarto configuration
+│   ├── js/
+│   │   ├── selection_core.js    # Core selection algorithm (UMD module)
+│   │   ├── select_names.js      # Wrapper (client demos)
+│   │   └── __tests__/           # Jest unit tests
+│   ├── data/
+│   │   └── sample_names.json    # 16-name sample dataset
+│   └── _site/             # Built static site (deployed to Pages)
+├── R/                     # Original R package source
+├── tests/                 # R package tests
+├── Makefile              # Common tasks
+└── README.md             # This file
 ```
 
-Using the site
-- Open the site in your browser (http://localhost:4000 when running via `docker-compose` or script).
-- Upload a dataset (CSV / JSON / Excel) or use the bundled sample.
-- If your column names differ from the package, use the Column mapping box to map fields (e.g., `name`, `identity`, `mean_correct`, `income`, `education`, `citizen`).
-- Choose `control` mode to select names that are similar across chosen attributes (keeps attributes constant across races), or `vary` mode to select names that maximize attribute differences across races.
-- Click `Run` to see results. Use `Download CSV` or `Download Excel` for client-side exports. Use `Download RDS` to request an `.rds` file from the Plumber API.
+## How It Works
 
-Development & tests
-- Run JS unit tests for selection logic:
-```bash
-cd quarto-site
-npm ci
-npm test
-```
-- Quick CORS check (start the API first):
-```bash
-chmod +x scripts/test_cors.sh
-./scripts/test_cors.sh http://localhost:8000
-```
-- Makefile targets are provided for common tasks, e.g. `make render`, `make build-image`, `make compose-up`, `make test-js`, `make test-cors`.
+The **selection algorithm** (in `quarto-site/js/selection_core.js`) implements the R package's core logic in JavaScript:
 
-Deployment & CI
-- GitHub Actions workflow (`.github/workflows/site-and-docker.yml`) does:
-	- Run JS tests, render the Quarto site, deploy the site to GitHub Pages.
-	- Build and push the Plumber Docker image to GitHub Container Registry (GHCR) and tags images with both `:latest` and the commit SHA.
-- See `README_DEPLOY.md` for Docker/compose and deployment notes.
+1. **Filter** the dataset by race and pronunciation correctness
+2. **Compute** the median value for each selected attribute
+3. **Rank** candidates by Euclidean distance to the median vector
+4. **Select** the requested number of names:
+   - **Control mode**: Names closest to the median (similar to each other)
+   - **Vary mode**: Names farthest from the median (diverse from each other)
+5. **Sort** results by optional attribute
 
-Notes
-- The site implements the package logic in client-side JavaScript for interactivity. For exact reproductions or to call R-specific functions, start the Plumber API (the Docker image attempts to install the package and exposes `/rds` to generate `.rds` files).
-- If the site and API are served from different origins, CORS is enabled in the Plumber API (`quarto-site/api/plumber.R`).
+Results are rendered as an interactive table with options to export as CSV or Excel.
+
+## How to Cite
+
+Kim, J and Crabtree, C. (2022). validatednamesr: R package for viewing, loading, and visualizing the Validated Names for Experimental Studies on Race and Ethnicity datasets.
+
 
 How to cite
 

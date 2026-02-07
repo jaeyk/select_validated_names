@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Validated Names</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+  <script src="js/selection_core.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    h1 {
+      color: #764ba2;
+      margin-top: 0;
+      text-align: center;
+    }
+    
+    p {
+      color: #666;
+      line-height: 1.8;
+    }
+    
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 0.9rem;
+    }
+    
+    input[type="number"],
+    select {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 8px;
+    }
+    
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    input[type="radio"] {
+      cursor: pointer;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    input[type="checkbox"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+    
+    .checkbox-item label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: normal;
+    }
+    
+    .attributes-section {
+      grid-column: 1 / -1;
+    }
+    
+    button {
+      grid-column: 1 / -1;
+      padding: 12px 24px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #764ba2;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+    
+    .results {
+      margin-top: 30px;
+    }
+    
+    .results h2 {
+      color: #764ba2;
+      margin-top: 0;
+    }
+    
+    .no-results {
+      padding: 20px;
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      border-radius: 4px;
+      color: #856404;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    
+    th {
+      background: #667eea;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .download-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .download-buttons button {
+      grid-column: auto;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      flex: 1;
+    }
+    
+    @media (max-width: 600px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      
+      .attributes-section {
+        grid-column: 1;
+      }
+      
+      button {
+        grid-column: 1;
+      }
+      
+      .radio-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .download-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Select Validated Names</h1>
+    
+    <p>
+      Choose your selection parameters below. The tool will select names from the sample dataset
+      based on your criteria using one of two selection modes:
+    </p>
+    <ul>
+      <li><strong>Control:</strong> Select names closest to the median of your chosen attributes</li>
+      <li><strong>Vary:</strong> Select names farthest from the median to maximize diversity</li>
+    </ul>
+    
+    <div class="controls">
+      <div class="control-group">
+        <label for="race">Race/Ethnicity</label>
+        <select id="race" name="race">
+          <option value="">All</option>
+          <option value="Asian">Asian</option>
+          <option value="White">White</option>
+          <option value="Black">Black</option>
+          <option value="Hispanic">Hispanic</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="pct-correct">Min Correct Pronunciation (%)</label>
+        <input type="number" id="pct-correct" name="pct-correct" min="0" max="100" value="0" step="5">
+      </div>
+      
+      <div class="control-group">
+        <label for="n-names">Number of Names to Select</label>
+        <input type="number" id="n-names" name="n-names" min="1" max="16" value="3" step="1">
+      </div>
+      
+      <div class="control-group">
+        <label for="order-by">Order Results By</label>
+        <select id="order-by" name="order-by">
+          <option value="">None (as selected)</option>
+          <option value="mean_correct">Pronunciation Correctness</option>
+          <option value="income_ord">Income</option>
+          <option value="education_ord">Education</option>
+          <option value="citizen">Citizenship</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label>Selection Mode</label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="mode-control" name="mode" value="control" checked>
+            <label for="mode-control" style="margin: 0;">Control</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="mode-vary" name="mode" value="vary">
+            <label for="mode-vary" style="margin: 0;">Vary</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="attributes-section">
+        <label>Attributes to Consider</label>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="attr-income" name="attributes" value="income_ord" checked>
+            <label for="attr-income">Income</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="attr-education" name="attributes" value="education_ord" checked>
+            <label for="attr-education">Education</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="attr-citizen" name="attributes" value="citizen">
+            <label for="attr-citizen">Citizenship</label>
+          </div>
+        </div>
+      </div>
+      
+      <button type="button" onclick="runSelection()">Run Selection</button>
+    </div>
+    
+    <div class="results" id="results"></div>
+  </div>
+
+  <script>
+    let currentData = [];
+
+    // Load sample data on page load
+    async function initializeSampleData() {
+      try {
+        const response = await fetch('data/sample_names.json');
+        const data = await response.json();
+        currentData = data;
+        console.log('Sample data loaded:', currentData.length, 'records');
+      } catch (error) {
+        console.error('Error loading sample data:', error);
+        document.getElementById('results').innerHTML = 
+          '<div class="no-results">Error loading sample data</div>';
+      }
+    }
+
+    function getSelectedAttributes() {
+      const checkboxes = document.querySelectorAll('input[name="attributes"]:checked');
+      return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    function runSelection() {
+      if (currentData.length === 0) {
+        document.getElementById('results').innerHTML = 
+          '<div class="no-results">Sample data not loaded. Please wait and try again.</div>';
+        return;
+      }
+
+      const race = document.getElementById('race').value;
+      const pctCorrect = parseInt(document.getElementById('pct-correct').value) / 100;
+      const nNames = parseInt(document.getElementById('n-names').value);
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const orderBy = document.getElementById('order-by').value;
+      const attributes = getSelectedAttributes();
+
+      if (attributes.length === 0) {
+        document.getElementById('results').innerHTML = 
+          '<div class="no-results">Please select at least one attribute to consider.</div>';
+        return;
+      }
+
+      try {
+        const selected = window.selectionCore.selectByMode(
+          currentData,
+          {
+            race: race || null,
+            pct_correct: pctCorrect,
+            n_names: nNames,
+            mode: mode,
+            attrs: attributes,
+            order_by_var: orderBy || null
+          }
+        );
+
+        renderResults(selected);
+      } catch (error) {
+        console.error('Selection error:', error);
+        document.getElementById('results').innerHTML = 
+          '<div class="no-results">Error during selection: ' + error.message + '</div>';
+      }
+    }
+
+    function renderResults(data) {
+      const resultsDiv = document.getElementById('results');
+      
+      if (!data || data.length === 0) {
+        resultsDiv.innerHTML = '<div class="no-results">No names match your criteria.</div>';
+        return;
+      }
+
+      let html = '<h2>Selected Names (' + data.length + ')</h2>';
+      
+      // Download buttons
+      html += '<div class="download-buttons">';
+      html += '<button onclick="downloadCSV()">Download CSV</button>';
+      html += '<button onclick="downloadExcel()">Download Excel</button>';
+      html += '</div>';
+
+      // Results table
+      html += '<table>';
+      html += '<thead><tr>';
+      html += '<th>Name</th>';
+      html += '<th>Race/Ethnicity</th>';
+      html += '<th>% Correct</th>';
+      html += '<th>Income</th>';
+      html += '<th>Education</th>';
+      html += '<th>Citizenship</th>';
+      html += '</tr></thead>';
+      html += '<tbody>';
+
+      data.forEach(row => {
+        html += '<tr>';
+        html += '<td>' + escapeHtml(row.name) + '</td>';
+        html += '<td>' + escapeHtml(row.identity) + '</td>';
+        html += '<td>' + (row.mean_correct * 100).toFixed(0) + '%</td>';
+        html += '<td>' + row.income_ord + '</td>';
+        html += '<td>' + row.education_ord + '</td>';
+        html += '<td>' + (row.citizen * 100).toFixed(0) + '%</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      resultsDiv.innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function downloadCSV() {
+      const selected = getTableData();
+      if (selected.length === 0) return;
+
+      const headers = ['Name', 'Race/Ethnicity', '% Correct', 'Income', 'Education', 'Citizenship'];
+      const rows = selected.map(row => [
+        row.name,
+        row.identity,
+        (row.mean_correct * 100).toFixed(0),
+        row.income_ord,
+        row.education_ord,
+        (row.citizen * 100).toFixed(0)
+      ]);
+
+      let csv = headers.join(',') + '\n';
+      rows.forEach(row => {
+        csv += row.map(cell => '"' + cell + '"').join(',') + '\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'selected_names.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function downloadExcel() {
+      const selected = getTableData();
+      if (selected.length === 0) return;
+
+      const headers = ['Name', 'Race/Ethnicity', '% Correct', 'Income', 'Education', 'Citizenship'];
+      const rows = selected.map(row => [
+        row.name,
+        row.identity,
+        (row.mean_correct * 100).toFixed(0),
+        row.income_ord,
+        row.education_ord,
+        (row.citizen * 100).toFixed(0)
+      ]);
+
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      ws['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Selected Names');
+      XLSX.writeFile(wb, 'selected_names.xlsx');
+    }
+
+    function getTableData() {
+      const table = document.querySelector('table');
+      if (!table) return [];
+
+      const rows = [];
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        if (cells.length > 0) {
+          rows.push({
+            name: cells[0].textContent,
+            identity: cells[1].textContent,
+            mean_correct: parseFloat(cells[2].textContent) / 100,
+            income_ord: parseInt(cells[3].textContent),
+            education_ord: parseInt(cells[4].textContent),
+            citizen: parseFloat(cells[5].textContent) / 100
+          });
+        }
+      });
+      return rows;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializeSampleData);
+  </script>
+</body>
+</html>
