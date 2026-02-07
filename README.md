@@ -45,6 +45,7 @@ To run the site on your local machine:
 ## Credits & Citation
 
 **Developed by:** [Jae Yeon Kim](https://jaeyk.github.io/) (UNC Chapel Hill)
+
 **Original R Package:** [Jae Yeon Kim](https://jaeyk.github.io/) and [Charles Crabtree](https://charlescrabtree.com/) (Monash University)
 
 If you use this tool or data in your research, please cite:
