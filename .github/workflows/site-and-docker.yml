@@ -18,9 +18,9 @@ jobs:
 
       # Only need to upload the web-app folder
       - name: Upload artifact for Pages
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: web-app
 
       - name: Deploy to Pages
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
